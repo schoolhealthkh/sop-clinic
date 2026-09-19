@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ប្រព័ន្ធចងក្រង SOP សាយ រះ</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Moul&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23004792'/><path d='M32 16v32M16 32h32' stroke='%23fff' stroke-width='8' stroke-linecap='round'/></svg>">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<input type="file" id="mediaFile" accept="image/*,video/*,application/pdf" hidden>
+<div id="prog" class="noprint fixed top-0 left-0 h-1 z-[60]" style="background:var(--accent);width:0%"></div>
+
+<!-- ================= NAV ================= -->
+<nav class="noprint fixed top-0 inset-x-0 z-50 backdrop-blur-lg border-b"
+     style="background:color-mix(in srgb,var(--card) 88%,transparent);border-color:var(--line)">
+  <div class="max-w-[1500px] mx-auto px-4 h-16 flex items-center gap-2.5">
+    <button id="btnToc" class="lg:hidden t17 pri bg-transparent border-0 cursor-pointer">☰</button>
+    <div class="w-9 h-9 rounded-xl bg-pri text-white grid place-items-center font-bold t13 flex-none" data-logo-text>SR</div>
+    <div class="hidden sm:block leading-tight">
+      <div class="moul t11 pri" data-clinic-kh>មន្ទីរសម្រាកព្យាបាល សាយ រះ</div>
+      <div class="t9 muted uppercase tracking-[.18em]" data-clinic-en>SAY RAS CLINIC</div>
+    </div>
+    <div class="flex-1"></div>
+
+    <div class="relative hidden md:block">
+      <input id="q" placeholder="ស្វែងរកក្នុង SOP…" class="fld t11" style="width:15rem;padding-top:.4rem;padding-bottom:.4rem;border-radius:999px">
+      <span id="qn" class="absolute -bottom-4 right-3 t9 muted"></span>
+    </div>
+
+    <span class="hidden sm:flex items-center gap-1">
+      <button class="chip" onclick="fs(-1)" title="បង្រួមអក្សរ">A−</button>
+      <span id="sizeBadge" class="t10 muted tnum font-bold" style="width:2.6rem;text-align:center">100%</span>
+      <button class="chip" onclick="fs(1)" title="ពង្រីកអក្សរ">A+</button>
+    </span>
+
+    <span id="syncState" class="t10 px-2.5 py-1 rounded-lg border font-semibold hidden sm:inline-block"
+          style="background:color-mix(in srgb,var(--primary) 8%,transparent);border-color:var(--line);color:var(--primary)">…</span>
+
+    <button class="chip" id="btnPresent" title="របៀបបទបង្ហាញ (P)">📽</button>
+    <button class="chip" id="btnTheme" title="ប្តូរពណ៌ផ្ទៃ">🌙</button>
+    <span id="adminBar" class="flex items-center gap-2"></span>
+  </div>
+</nav>
+
+<div class="max-w-[1500px] mx-auto px-4 pt-24 pb-24 flex gap-7">
+  <aside id="toc" class="noprint hidden lg:block w-56 flex-none">
+    <div class="sticky top-24 card p-3">
+      <div class="t9 uppercase tracking-[.18em] muted px-2 pb-2 font-bold">មាតិកា</div>
+      <div id="tocList"></div>
+      <div class="mt-3 pt-3 border-t t10 muted px-2" style="border-color:var(--line)">
+        <div id="readStat">អានរួច ០%</div>
+      </div>
+    </div>
+  </aside>
+  <main class="flex-1 min-w-0 space-y-12" id="main"></main>
+</div>
+
+<footer class="noprint py-8 text-center t9 uppercase tracking-[.2em] muted border-t" style="border-color:var(--line)">
+  ប្រព័ន្ធប្រមូលមតិ និងចងក្រង SOP វេជ្ជសាស្ត្រ · <span data-clinic-en>SAY RAS CLINIC</span>
+</footer>
+
+<!-- ================= MODALS ================= -->
+<div id="confirmModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 noprint"
+     style="background:rgba(8,15,30,.55);backdrop-filter:blur(4px)" hidden>
+  <div class="card w-full max-w-md p-6 space-y-4">
+    <div class="flex items-start gap-3">
+      <div id="confirmIcon" class="w-11 h-11 rounded-2xl grid place-items-center flex-none t17"
+           style="background:color-mix(in srgb,var(--bad) 14%,transparent)">⚠️</div>
+      <div class="min-w-0">
+        <h3 id="confirmTitle" class="t14 font-bold m-0">តើប្រាកដទេ?</h3>
+        <p id="confirmMessage" class="t11 muted mt-1.5 leading-relaxed break-words whitespace-pre-line m-0"></p>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2">
+      <button type="button" id="confirmCancelBtn" class="btn btn-ghost">បោះបង់</button>
+      <button type="button" id="confirmOkBtn" class="btn btn-bad">បញ្ជាក់</button>
+    </div>
+  </div>
+</div>
+
+<div id="pinModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 noprint"
+     style="background:rgba(8,15,30,.55);backdrop-filter:blur(4px)" hidden>
+  <div class="card w-full max-w-sm p-6 space-y-4">
+    <div class="flex items-start gap-3">
+      <div class="w-11 h-11 rounded-2xl grid place-items-center flex-none t17"
+           style="background:color-mix(in srgb,var(--primary) 14%,transparent)">🔐</div>
+      <div>
+        <h3 class="t14 font-bold m-0">ចូលជាអ្នកគ្រប់គ្រង</h3>
+        <p class="t11 muted mt-1 leading-relaxed m-0">តម្រូវសម្រាប់ការអនុម័តសំណើ ការលុប ការកែពិធីការ និងការភ្ជាប់ឯកសារ។ បុគ្គលិកធម្មតាមិនចាំបាច់ចូលទេ។</p>
+      </div>
+    </div>
+    <input type="password" id="pinInput" inputmode="numeric" autocomplete="off" placeholder="លេខសម្ងាត់"
+           class="fld text-center t17 tnum" style="letter-spacing:.4em">
+    <div id="pinError" class="t10 rounded-lg px-3 py-1.5 font-semibold"
+         style="background:color-mix(in srgb,var(--bad) 12%,transparent);color:var(--bad)" hidden></div>
+    <div class="flex justify-end gap-2">
+      <button type="button" id="pinCancelBtn" class="btn btn-ghost">បោះបង់</button>
+      <button type="button" id="pinOkBtn" class="btn">ចូល</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-5 right-5 z-[80] flex flex-col gap-2 pointer-events-none noprint"></div>
+
+<!-- ================= LIGHTBOX ================= -->
+<div id="lb" class="noprint fixed inset-0 z-[90] items-center justify-center flex-col p-12"
+     style="background:rgba(5,10,20,.96);display:none" role="dialog">
+  <div id="lbbody" class="flex items-center justify-center" style="max-width:92vw;max-height:74vh"></div>
+  <div id="lbcap" class="text-white mt-4 t13 text-center font-semibold" style="max-width:80vw"></div>
+  <div id="lbn" class="t10 mt-1 tracking-[.2em] font-bold" style="color:#94a3b8"></div>
+  <button class="lbbtn" id="lbprev" style="left:26px;top:50%;transform:translateY(-50%)">‹</button>
+  <button class="lbbtn" id="lbnext" style="right:26px;top:50%;transform:translateY(-50%)">›</button>
+  <button class="lbbtn" id="lbclose" style="right:26px;top:26px;font-size:20px">✕</button>
+</div>
+
+<!-- ================= PRESENTATION ================= -->
+<div id="showpick" class="noprint fixed inset-0 z-[95] items-center justify-center p-6"
+     style="background:rgba(5,10,20,.72);backdrop-filter:blur(4px);display:none" role="dialog">
+  <div class="card w-full max-w-xl p-6" style="max-height:88vh;overflow:auto">
+    <div class="moul t15 pri">ជ្រើសខ្លឹមសារសម្រាប់បទបង្ហាញ</div>
+    <div class="t11 muted mt-1 leading-relaxed">ជ្រើសជំងឺ និងផ្នែកដែលចង់បង្ហាញ — មិនចាំបាច់បង្ហាញទាំងអស់ទេ</div>
+    <div class="flex flex-wrap gap-2 my-4" id="pkPresets"></div>
+    <div class="t9 uppercase tracking-[.16em] muted font-bold mb-2">ជំងឺ</div>
+    <div id="pkDiseases" class="grid sm:grid-cols-2 gap-1 mb-4"></div>
+    <div class="t9 uppercase tracking-[.16em] muted font-bold mb-2">ផ្នែក</div>
+    <div id="pkPillars" class="grid sm:grid-cols-2 gap-1"></div>
+    <label class="flex gap-2.5 items-start mt-4 p-3 rounded-xl cursor-pointer t11 leading-relaxed"
+           style="background:color-mix(in srgb,var(--accent) 14%,transparent)">
+      <input type="checkbox" id="pkOnePer" class="mt-1 flex-none" style="width:17px;height:17px;accent-color:var(--primary)">
+      <span>ស្លាយមួយក្នុងមួយចំណុច — លម្អិតជាង តែស្លាយច្រើន (បើមិនគូស នឹងដាក់ចំណុចទាំងអស់ក្នុងស្លាយតែមួយក្នុងមួយផ្នែក)</span>
+    </label>
+    <div class="flex items-center gap-2 mt-5 flex-wrap">
+      <div id="pkCount" class="flex-1 t11 font-bold pri tnum">០ ស្លាយ</div>
+      <button class="btn" id="pkGo">ចាប់ផ្តើម</button>
+      <button class="btn btn-ghost" id="pkCancel">បោះបង់</button>
+    </div>
+  </div>
+</div>
+
+<div id="show" class="noprint fixed inset-0 z-[96] flex-col" style="display:none;color:#fff;
+     background:radial-gradient(1200px 700px at 18% -12%,#0b63c5 0%,transparent 58%),
+                radial-gradient(900px 600px at 112% 112%,#d4af37 0%,transparent 52%),
+                linear-gradient(135deg,#001c42 0%,#00306a 55%,#004792 100%)" role="dialog">
+  <div id="showbar" style="height:4px;background:rgba(255,255,255,.16);flex:none"><i style="display:block;height:100%;width:0;background:#d4af37;transition:width .45s ease"></i></div>
+  <div id="showslides" class="flex-1 relative overflow-hidden"></div>
+  <div class="flex-none flex items-center justify-center gap-4 py-5 t11 tracking-[.18em] font-bold">
+    <button class="shbtn" id="shprev">‹</button>
+    <button class="shbtn" id="shplay">▶</button>
+    <span id="shnum" class="tnum" style="min-width:5rem;text-align:center;opacity:.85">1 / 1</span>
+    <button class="shbtn" id="shnext">›</button>
+  </div>
+  <button class="shbtn" id="shclose" style="position:fixed;top:20px;right:20px;font-size:15px">✕</button>
+</div>
+
+<div id="printDocument" class="print-only hidden p-1 bg-white text-black"><div id="printContentBody"></div></div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="assets/config.js"></script>
+<script src="assets/api.js"></script>
+<script src="assets/core.js"></script>
+<script src="assets/render.js"></script>
+<script src="assets/actions.js"></script>
+<script src="assets/print-templates.js"></script>
+<script src="assets/print-stats.js"></script>
+<script src="assets/admin.js"></script>
+<script src="assets/chrome.js"></script>
+
+</body>
+</html>
