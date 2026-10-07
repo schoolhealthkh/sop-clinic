@@ -9,7 +9,30 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Moul&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23004792'/><path d='M32 16v32M16 32h32' stroke='%23fff' stroke-width='8' stroke-linecap='round'/></svg>">
+<link rel="icon" type="image/png" href="assets/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="description" content="ប្រព័ន្ធចងក្រង SOP ផ្លូវការរបស់មន្ទីរសម្រាកព្យាបាល សាយ រះ — បទដ្ឋានព្យាបាល ៦ ជំងឺ ២៧២ ចំណុច បោះពុម្ព A4 និងស្នើកែលម្អបាន។">
+<meta name="theme-color" content="#004792">
+<link rel="canonical" href="https://schoolhealthkh.github.io/sop-clinic/">
+
+<!-- ===== រូបភាពតំណាង នៅពេលផ្ញើតំណក្នុង Telegram / Messenger / Facebook ===== -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="មន្ទីរសម្រាកព្យាបាល សាយ រះ — SAY RAS CLINIC">
+<meta property="og:locale" content="km_KH">
+<meta property="og:url" content="https://schoolhealthkh.github.io/sop-clinic/">
+<meta property="og:title" content="ប្រព័ន្ធចងក្រង SOP គ្លីនិក — សាយ រះ">
+<meta property="og:description" content="បទដ្ឋានព្យាបាលផ្លូវការ ៦ ជំងឺ · ២៧២ ចំណុចពិធីការ · បោះពុម្ព A4 · បើកតាមទូរស័ព្ទបានភ្លាម មិនត្រូវការគណនី។">
+<meta property="og:image" content="https://schoolhealthkh.github.io/sop-clinic/assets/preview.jpg">
+<meta property="og:image:secure_url" content="https://schoolhealthkh.github.io/sop-clinic/assets/preview.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ប្រព័ន្ធចងក្រង SOP គ្លីនិក សាយ រះ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ប្រព័ន្ធចងក្រង SOP គ្លីនិក — សាយ រះ">
+<meta name="twitter:description" content="បទដ្ឋានព្យាបាលផ្លូវការ ៦ ជំងឺ · ២៧២ ចំណុចពិធីការ · បោះពុម្ព A4 · មិនត្រូវការគណនី។">
+<meta name="twitter:image" content="https://schoolhealthkh.github.io/sop-clinic/assets/preview.jpg">
+
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
@@ -22,7 +45,12 @@
      style="background:color-mix(in srgb,var(--card) 88%,transparent);border-color:var(--line)">
   <div class="max-w-[1500px] mx-auto px-4 h-16 flex items-center gap-2.5">
     <button id="btnToc" class="lg:hidden t17 pri bg-transparent border-0 cursor-pointer">☰</button>
-    <div class="w-9 h-9 rounded-xl bg-pri text-white grid place-items-center font-bold t13 flex-none" data-logo-text>SR</div>
+    <!-- រូបសញ្ញាគ្លីនិក (បើរូបបាត់ ប្តូរទៅអក្សរកាត់វិញ) -->
+    <div class="w-9 h-9 rounded-xl bg-white grid place-items-center flex-none overflow-hidden relative" style="box-shadow:0 0 0 1px var(--line);width:2.25rem;height:2.25rem;display:grid;place-items:center;flex:none">
+      <img src="assets/logo.png" alt="SAY RAS CLINIC" width="32" height="32" class="w-8 h-8 object-contain" style="width:2rem;height:2rem;object-fit:contain"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+      <span class="absolute inset-0 rounded-xl bg-pri text-white place-items-center font-bold t13" style="display:none" data-logo-text>SR</span>
+    </div>
     <div class="hidden sm:block leading-tight">
       <div class="moul t11 pri" data-clinic-kh>មន្ទីរសម្រាកព្យាបាល សាយ រះ</div>
       <div class="t9 muted uppercase tracking-[.18em]" data-clinic-en>SAY RAS CLINIC</div>
