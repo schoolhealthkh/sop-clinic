@@ -19,6 +19,8 @@ function getCaregiverCardHTML(isPrint, diseaseKey) {
         <div class="${isPrint ? 'a4-page-lock' : ''} font-sans leading-tight">
           <!-- Professional Official Clinic Header -->
           <div class="border-b-2 border-sky-950 pb-1.5 mb-1.5 flex items-center justify-between gap-3">
+            <div class="flex items-start gap-2.5">
+            <img src="assets/logo.png" alt="" width="34" height="34" class="w-9 h-9 object-contain flex-shrink-0 mt-0.5" style="width:34px;height:34px;object-fit:contain;flex:none">
             <div>
               <div class="text-[11.5pt] font-bold text-sky-950 tracking-wide flex items-center gap-2">
                 <span>${CLINIC.nameKh}</span>
@@ -26,6 +28,7 @@ function getCaregiverCardHTML(isPrint, diseaseKey) {
               </div>
               <h1 class="text-[12pt] font-bold text-sky-900 mt-0.5 leading-snug">${escapeHtml(PT("cgTitle","ប័ណ្ណតាមដាន និងសំណួរសួរនាំសុខភាពអ្នកជំងឺ"))} (${proto.title.split('(')[0]})</h1>
               <div class="text-[7.2pt] text-slate-500 font-medium">${escapeHtml(PT("cgTitleEn","PATIENT & CAREGIVER MONITORING FLOWSHEET"))} • ស្តង់ដារ A4 សម្រាប់អ្នកជំងឺគ្រប់វ័យ (កុមារ ពេញវ័យ ចាស់)</div>
+            </div>
             </div>
             
             <div class="text-right text-[7.2pt] text-slate-600 bg-sky-50/80 p-1.5 rounded-xl border border-sky-200 flex-shrink-0">
@@ -173,6 +176,8 @@ function getCaregiverCardHTML(isPrint, diseaseKey) {
         <div class="${isPrint ? 'a4-page-lock' : ''} font-sans leading-tight">
           <!-- Professional Official Clinic Header -->
           <div class="border-b-2 border-slate-800 pb-1.5 mb-1.5 flex items-center justify-between gap-3">
+            <div class="flex items-start gap-2.5">
+            <img src="assets/logo.png" alt="" width="34" height="34" class="w-9 h-9 object-contain flex-shrink-0 mt-0.5" style="width:34px;height:34px;object-fit:contain;flex:none">
             <div>
               <div class="text-[11.5pt] font-bold text-slate-900 tracking-wider flex items-center gap-2">
                 <span>${CLINIC.nameKh}</span>
@@ -180,6 +185,7 @@ function getCaregiverCardHTML(isPrint, diseaseKey) {
               </div>
               <h1 class="text-[12pt] font-bold text-slate-900 mt-0.5 leading-snug">${escapeHtml(PT("stTitle","ពិធីការស្តង់ដារ និងតារាងតាមដានគ្លីនិក"))} (${escapeHtml(PT("stTitleEn","INPATIENT CLINICAL FLOWSHEET"))})</h1>
               <div class="text-[7.2pt] text-slate-500 font-medium">ឯកសារការងារសម្រាប់វេជ្ជបណ្ឌិត និងគិលានុបដ្ឋាយិកាប្រចាំការ | គ្រប់វ័យ (កុមារ ពេញវ័យ ចាស់) | Ref: ${docCode("SOP",key)}</div>
+            </div>
             </div>
 
             <div class="text-right text-[7.2pt] text-slate-600 bg-slate-50 p-1.5 rounded-xl border border-slate-300 flex-shrink-0">
