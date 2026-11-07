@@ -124,20 +124,88 @@ function pillarBlock(key,proto,merged,P,n){
 function protoRow(it,i,P){
   const id=itemId(it), txt=itemText(it);
   const med=(mediaMap[id]||[]);
-  return `<div class="rounded-lg p-2.5" style="background:var(--bg);border:1px solid var(--line)">
-    <div class="flex items-start justify-between gap-2">
-      <div class="flex items-start gap-2 min-w-0">
-        <span class="font-bold flex-none t12" style="color:var(${P.v})">${P.numbered?(i+1)+'.':'•'}</span>
-        <span class="t12.5 leading-relaxed">${escapeHtml(txt)}</span>
-      </div>
-      <button class="adminonly chip flex-none t9" style="padding:.15rem .5rem"
-        onclick="deleteProtocolItem('${id}','${escapeAttr(txt)}')" title="លុបចំណុចនេះ">🗑</button>
+  return `<div class="prow" data-item="${escapeAttr(id||'')}" style="--pc:var(${P.v})">
+    <div class="prow-main">
+      <span class="pnum">${P.numbered?(i+1):'•'}</span>
+      <span class="ptext">${escapeHtml(txt)}</span>
+      <span class="ptools adminonly">
+        <button class="adm-mini" title="កែអត្ថបទ"  onclick="protoEditStart(this)">✏️</button>
+        <button class="adm-mini" title="ឡើងលើ"    onclick="protoMove(this,'up')">▲</button>
+        <button class="adm-mini" title="ចុះក្រោម"  onclick="protoMove(this,'down')">▼</button>
+        <button class="adm-mini bad" title="លុបចំណុចនេះ"
+          onclick="deleteProtocolItem('${id}','${escapeAttr(txt)}')">🗑</button>
+      </span>
     </div>
     <div class="mediagrid" ${med.length?'':'data-empty="1"'}>
       ${med.map(m=>mediaThumb(m)).join('')}
       ${mediaAddButtons(id)}
     </div>
   </div>`;
+}
+
+/* ============================================================
+   ៩ខ. កែអត្ថបទនៅនឹងកន្លែង — សម្រាប់អ្នកគ្រប់គ្រង
+   មិនចាំបាច់ចូលផ្ទាំងកំណត់ទេ ហើយមិន reload ទាំងទំព័រ
+   ============================================================ */
+function pgrow(ta){ ta.style.height='auto'; ta.style.height=(ta.scrollHeight+2)+'px'; }
+
+function protoEditStart(btn){
+  if(typeof requireAdmin==='function' && !requireAdmin()) return;
+  const row=btn.closest('.prow'); if(!row||row.classList.contains('editing')) return;
+  const span=row.querySelector('.ptext'), main=row.querySelector('.prow-main');
+  const id=row.getAttribute('data-item');
+  row.classList.add('editing');
+
+  const box=document.createElement('div'); box.className='pedit';
+  const ta=document.createElement('textarea'); ta.className='fld'; ta.value=span.textContent;
+  const bar=document.createElement('div'); bar.className='pedit-bar';
+  const hint=document.createElement('span'); hint.className='t9 muted pedit-hint';
+  hint.textContent='Ctrl + Enter = រក្សាទុក · Esc = បោះបង់';
+  const cancel=document.createElement('button'); cancel.type='button'; cancel.className='chip t10'; cancel.textContent='បោះបង់';
+  const save=document.createElement('button'); save.type='button'; save.className='btn t10'; save.textContent='💾 រក្សាទុក';
+  bar.appendChild(hint); bar.appendChild(cancel); bar.appendChild(save);
+  box.appendChild(ta); box.appendChild(bar);
+  main.parentNode.insertBefore(box, main.nextSibling);
+
+  pgrow(ta); ta.focus();
+  try{ ta.setSelectionRange(ta.value.length, ta.value.length); }catch(e){}
+  ta.addEventListener('input', ()=>pgrow(ta));
+  ta.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ e.preventDefault(); shut(); }
+    else if(e.key==='Enter' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); commit(); }
+  });
+  cancel.onclick=shut; save.onclick=commit;
+
+  function shut(){ box.remove(); row.classList.remove('editing'); }
+  function unlock(){ save.disabled=false; cancel.disabled=false; save.textContent='💾 រក្សាទុក'; }
+  async function commit(){
+    const text=(ta.value||'').trim();
+    if(!text){ toast('អត្ថបទមិនអាចទទេបានទេ','warning'); return; }
+    if(text===span.textContent){ shut(); return; }
+    save.disabled=true; cancel.disabled=true; save.textContent='កំពុងរក្សាទុក…';
+    try{
+      const res=await call('apiUpdateProtocolItem', adminPin, id, text);
+      if(!res||!res.ok){ toast((res&&res.error)||'រក្សាទុកមិនបាន','error'); unlock(); return; }
+      span.textContent=text; patchItemText(id,text);
+      row.classList.add('justsaved'); setTimeout(()=>row.classList.remove('justsaved'),1600);
+      toast('បានរក្សាទុក','success'); shut();
+    }catch(err){ toast('រក្សាទុកមិនបាន៖ '+(err&&err.message||err),'error'); unlock(); }
+  }
+}
+
+/** ធ្វើបច្ចុប្បន្នភាពទិន្នន័យក្នុងកម្មវិធី ដោយមិនទាញពីម៉ាស៊ីនមេឡើងវិញ */
+function patchItemText(id,text){
+  diseaseKeys().forEach(k=>PILLAR_KEYS.forEach(p=>{
+    (currentProtocols[k][p]||[]).forEach(it=>{
+      if(it && typeof it==='object' && it.id===id) it.text=text;
+    });
+  }));
+}
+
+async function protoMove(btn,dir){
+  if(typeof requireAdmin==='function' && !requireAdmin()) return;
+  const row=btn.closest('.prow'); if(!row) return;
+  await serverAction('apiMoveProtocolItem',[adminPin,row.getAttribute('data-item'),dir],'');
 }
 
 function mergedRow(m,P){
